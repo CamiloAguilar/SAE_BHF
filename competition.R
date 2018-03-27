@@ -143,6 +143,7 @@ names(gr_vars) <- c("Obj", "Gr1", "Gr2", "Gr3", "Gr4")
 ## Modelo BHF ####
 #***********************
 start_time <- Sys.time()
+## Se demora 53.33993 mins
 modelos <- fit.BHF(muestra=muestra3etapas, pop=est, grupo_vars=gr_vars, dominio="CODIGOMUNICIPIO",
                    n_bootstrap = 200, semilla=12345)
 end_time <- Sys.time()
@@ -162,7 +163,7 @@ tabla_ajuste
 write.table(tabla_ajuste, "./results/Resultado_ajuste.csv", sep=";", row.names = F)
 
 which.min(tabla_ajuste$mean_cve)
-tabla_ajuste[49,]
+tabla_ajuste[71,]
 
 
 

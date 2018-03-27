@@ -6,6 +6,10 @@ output:
     highlight: tango
 ---
 
+## Código fuente:
+
+**Camilo Alejandro Aguilar L.**, [GitHub](https://github.com/CamiloAguilar/SAE_BHF). Para ejecutar la estimación con las variables seleccionadas por favor abrir el archivo "competicion.R". 
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(dplyr)
@@ -55,10 +59,30 @@ muestra3etapas <- readRDS("./data/muestra3etapas.RDS")
 
 ## Preparación de los datos
 
-Debido a que la base de datos contiene resultados faltantes, se ha realizado una imputación sobre los mismos; si la variable es categórica, se rellena el faltante con la moda, si es una variable numérica, se rellena con el valor medio de la variable. Un detalle de dicha imputación puede observarse en el script 'competicion.R'. 
+Debido a que la base de datos contiene resultados faltantes, se ha realizado una imputación sobre los mismos; si la variable es categórica, se rellena el faltante con la moda, si es una variable numérica, se rellena con el valor medio de la variable. Un detalle de dicha imputación puede observarse en el script 'competicion.R'. En el mismo script, se detalla una necesaria coerción de variables.
 
-En el mismo script, se detalla una necesaria coerción de variables
+<br/><br/>
 
+## Selección del mejor modelo
+
+Para la selección del modelo que minimiza el coeficiente de variación, el presente repositorio contiene la definición de una función denominada 'fit.BHF', que realiza el ajuste del modelo BHF para todas las posibles combinaciones de variables que cumplen la reglas mencionadas anteriormente. 
+
+La función y parámetros necesarios se muestran an continuación
+
+```{r function, eval=FALSE, message=FALSE, warning=FALSE}
+modelos <- fit.BHF(muestra=muestra3etapas, pop=est, grupo_vars=gr_vars, dominio="CODIGOMUNICIPIO",
+                   n_bootstrap = 200, semilla=12345)
+```
+
+El resultado de dicha función es una lista que contiene cada combinación de variables evaluada, el ajuste del modelo, las estimaciones para cada dominio y los respectivos 'cve' y 'mse'. Se escoje el modelo con menor 'cve'.
+
+## Resultados
+
+Como resultado de la función mencionada anteriormente, se determinó que el mejor modelo posible, resulta de considerar las variables; 'CIENCIAS_NATURALES_PUNT', 'FINS_ESTRATOVIVIENDAENERGIA', 'NATURALEZA' y 'INGLES_DESEM', con un cve=1.13551 y un mse=0.3049.
+
+La tabla con todos los resultados pueden detallarse en el archivo './results/Resultado_ajuste.csv'
+
+<br/><br/>
 
 
 

@@ -1,2 +1,87 @@
-# SAE_BHF
-Small area estimation with Batesse Harter Fuller techniques 
+---
+title: "SAE - Estimación de resultados pruebas saber 11 por municipio"
+output: 
+  html_document:
+    theme: united
+    highlight: tango
+---
+
+## Código fuente:
+
+**Camilo Alejandro Aguilar L.**, [GitHub](https://github.com/CamiloAguilar/SAE_BHF) 
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(dplyr)
+library(rlang)
+library(sae)
+library(survey)
+library(nlme)
+library(TeachingSampling)
+library(stringr)
+library(kableExtra)
+library(knitr)
+options(survey.lonely.psu="adjust")
+```
+
+## Abstract
+
+Las pruebas *saber 11* es un examen de carácter obligatorio, el cual es diseñado por el Instituto Colombiano para la Evaluación de la Educación, conocido por las siglas ICFES (de Instituto Colombiano para el Fomento de la Educación Superior), el cual comprueba el grado de desarrollo de las competencias de los estudiantes que están por finalizar el grado undécimo de la Educación Media. Consta de cinco pruebas:
+
+* Lectura crítica
+* Matemáticas
+* Sociales y ciudadanas
+* Ciencias naturales
+* Inglés
+
+También hay tres módulos asociados a temáticas y contenidos específicos que los estudiantes pueden presentar de acuerdo a su área de formación profesional.
+
+El objetivo del presente documento es presentar una estimación por muestreo del puntaje medio específico para la asignatura de Matemáticas, por cada municipio del territorio colombiano. Para dicha estimación se hace uso del estimador de Batisse Harter Fuller (BHF), contenido en la libería *sae*. 
+
+Se desea obtener el mejor modelo posible, medido como el de menor coeficiente de variación medio, y que cumpla con las siguientes características para la selección de variables
+
+* $\overline{Y}$ (Variable objetivo) : Puntaje medio matemáticas
+* $X_1$ : Puntaje medio en otra asignatura
+* $X_2$ : Estrato servicio público
+* $X_3$ : Variable asociada al colegio
+* $X_4$ : Una variable de libre selección.
+
+<br/><br/>
+
+## Datos de estudio
+
+La población de estudio son los resultados históricos de la prueba para un año particular, aplicada sobre una base de 535254 estudiantes, sobre la cual se ha seleccionado una muestra compleja, de 5556 resultados. A partir de dicha muestra se realizarán las estimaciones para los resultados de cada municipio.
+
+```{r info}
+est <- readRDS("./data/estudiantes.rds")
+muestra3etapas <- readRDS("./data/muestra3etapas.RDS")
+```
+
+## Preparación de los datos
+
+Debido a que la base de datos contiene resultados faltantes, se ha realizado una imputación sobre los mismos; si la variable es categórica, se rellena el faltante con la moda, si es una variable numérica, se rellena con el valor medio de la variable. Un detalle de dicha imputación puede observarse en el script 'competicion.R'. En el mismo script, se detalla una necesaria coerción de variables.
+
+<br/><br/>
+
+## Selección del mejor modelo
+
+Para la selección del modelo que minimiza el coeficiente de variación, el presente repositorio contiene la definición de una función denominada 'fit.BHF', que realiza el ajuste del modelo BHF para todas las posibles combinaciones de variables que cumplen la reglas mencionadas anteriormente. 
+
+La función y parámetros necesarios se muestran an continuación
+
+```{r function, eval=FALSE, message=FALSE, warning=FALSE}
+modelos <- fit.BHF(muestra=muestra3etapas, pop=est, grupo_vars=gr_vars, dominio="CODIGOMUNICIPIO",
+                   n_bootstrap = 200, semilla=12345)
+```
+
+El resultado de dicha función es una lista que contiene cada combinación de variables evaluada, el ajuste del modelo, las estimaciones para cada dominio y los respectivos 'cve' y 'mse'. Se escoje el modelo con menor 'cve'.
+
+## Resultados
+
+Como resultado de la función mencionada anteriormente, se determinó que el mejor modelo posible, resulta de considerar las variables; 'CIENCIAS_NATURALES_PUNT', 'FINS_ESTRATOVIVIENDAENERGIA', 'NATURALEZA' y 'INGLES_DESEM', con un cve=1.13551 y un mse=0.3049
+
+La tabla con todos los resultados pueden detallarse en el archivo './results/Resultado_ajuste.csv'
+
+<br/><br/>
