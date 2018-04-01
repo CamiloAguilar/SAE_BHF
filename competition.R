@@ -102,6 +102,7 @@ est$INGLES_PUNT[is.na(est$INGLES_PUNT)]
 est$INGLES_PUNT <- as.numeric(est$INGLES_PUNT)
 est$INGLES_DESEM[is.na(est$INGLES_DESEM)]
 est$EVALUADOS[is.na(est$EVALUADOS)]
+saveRDS(est, "./results/estudiantes.rds")
 
 
 muestra3etapas$CALENDARIO <- as.factor(muestra3etapas$CALENDARIO)
